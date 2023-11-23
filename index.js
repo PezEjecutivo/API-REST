@@ -1,63 +1,94 @@
 /**
- * Tres formas de almacenar valores en memoria en Javascript
- *     - let: se puede modificar
- *     - var: se puede modificar
- *     - const: es constante y no se puede modificar
+ * Tres formas de almacenar valores en memoria en javascript:
+ *      let: se puede modificar
+ *      var: se puede modificar
+ *      const: es constante y no se puede modificar
  */
 
-//Importamos las bibliotecas necesarias.
-//Concretamente el framework express.
-const express = require('express');
+// Importamos las bibliotecas necesarias.
+// Concretamente el framework express.
+const express = require("express");
 
-// Inicializamos la aplicacion con express
+// Inicializamos la aplicación
 const app = express();
 
+// Indicamos que la aplicación puede recibir JSON (API Rest)
 app.use(express.json());
 
-//Indicamos el puerto en el que vamos a desplegar la aplicación
+// Indicamos el puerto en el que vamos a desplegar la aplicación
 const port = process.env.PORT || 8080;
 
-//Arrancamos la aplicacion
+// Arrancamos la aplicación
 app.listen(port, () => {
-    console.log(`Servidor desplegado en puerto: ${port}`);
-})
+  console.log(`Servidor desplegado en puerto: ${port}`);
+});
 
-//Crea un array de coches
-let coches = [
-    { "marca": "Renault", "modelo": "Clio" },
-    { "marca": "Nissan", "modelo": "Skyline R34" }
+// Definimos una estructura de datos
+// (temporal hasta incorporar una base de datos)
+
+//Creamos el JSON de concesionario y sus arrays de coches
+let concesionario = [
+  {
+    nombre: "Nombre X",
+    direccion: "Calle X",
+    //Creamos un array de coches, dentro del concesionario
+    coches: [
+      { modelo: "Modelo 1X", cv: "1X cv", precio: "1X Dinero" },
+      { modelo: "Modelo 2X", cv: "2X cv", precio: "2X Dinero" },
+      { modelo: "Modelo 3X", cv: "3X cv", precio: "3X Dinero" },
+    ],
+  },
+  {
+    nombre: "Nombre Y",
+    direccion: "Calle Y",
+    coches: [
+      { modelo: "Modelo 1Y", cv: "1Y cv", precio: "1Y Dinero" },
+      { modelo: "Modelo 2Y", cv: "2Y cv", precio: "2Y Dinero" },
+      { modelo: "Modelo 3Y", cv: "3Y cv", precio: "3Y Dinero" },
+    ],
+  },
+  {
+    nombre: "Nombre H",
+    direccion: "Calle H",
+    coches: [
+      { modelo: "Modelo 1H", cv: "1H cv", precio: "1H Dinero" },
+      { modelo: "Modelo 2H", cv: "2H cv", precio: "2H Dinero" },
+      { modelo: "Modelo 3H", cv: "3H cv", precio: "3H Dinero" },
+    ],
+  },
 ];
 
-
-//Lista todos los coches
-app.get("/coches", (request, response) => {
-    response.json(coches);
+// Lista todos los concesionarios
+app.get("/concesionarios", (request, response) => {
+  response.json(concesionario);
 });
 
-//Añadir un nuevo coche
-app.post("/coches", (request, response) => {
-    coches.push(request.body);
-    response.json({ "message": "ok" });
+// Añadir un nuevo concesionarios
+app.post("/concesionarios", (request, response) => {
+  concesionario.push(request.body);
+  response.json({ message: "ok" });
 });
 
-//Obtener un solo coche
-app.get("/coches/:id", (request, response) => {
-    const id = request.params.id;
-    const result = coches[id];
-    response.json({ result });
+// Obtener un solo concesionarios
+app.get("/concesionarios/:id", (request, response) => {
+  const id = request.params.id;
+  const result = concesionario[id];
+  response.json({ result });
 });
 
-//Actualizar un solo coche
-app.put("/coches/:id", (request, response) => {
-    const id = request.params.id;
-    coches[id] = request.body;
-    response.json({ message: "ok" });
-})
+// Actualizar un solo concesionarios
+app.put("/concesionarios/:id", (request, response) => {
+  const id = request.params.id;
+  concesionario[id] = request.body;
+  response.json({ message: "ok" });
+});
 
-//Borramos un solo coche
-app.delete("/coches/:id", (request, response) => {
-    const id = request.params.id;
-    coches = coches.filter((item) => coches.indexOf(item) == id);
+// Borrar un elemento del array
+app.delete("/concesionarios/:id", (request, response) => {
+  const id = request.params.id;
+  concesionario = concesionario.filter(
+    (item) => concesionario.indexOf(item) !== id
+  );
 
-    response.json({ message: "ok" })
-})
+  response.json({ message: "ok" });
+});
