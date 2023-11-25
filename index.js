@@ -85,10 +85,8 @@ app.put("/concesionarios/:id", (request, response) => {
 
 // Borrar un elemento del array
 app.delete("/concesionarios/:id", (request, response) => {
-  const id = request.params.id;
-  concesionario = concesionario.filter(
-    (item) => concesionario.indexOf(item) !== id
-  );
+  const id = parseInt(request.params.id);
+  concesionario = concesionario.filter((item, index) => index !== id);
 
   response.json({ message: "ok" });
 });
