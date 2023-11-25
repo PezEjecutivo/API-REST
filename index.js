@@ -125,7 +125,9 @@ app.put("/concesionarios/:id/coches/:cocheid", (request, response) => {
 app.delete("/concesionarios/:id/coches/:cocheid", (request, response) => {
   const id = parseInt(request.params.id);
   const cocheid = parseInt(request.params.cocheid);
-  concesionario = concesionario.filter((item, index) => index !== id);
+  concesionario[id].coches = concesionario[id].coches.filter(
+    (item, index) => index !== cocheid
+  );
 
   response.json({ message: "ok" });
 });
