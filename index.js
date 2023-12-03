@@ -35,6 +35,7 @@ app.listen(port, () => {
 //Creamos el JSON de concesionario y sus arrays de coches
 let concesionario = [
     {
+        id: 0,
         nombre: "Nombre X",
         direccion: "Calle X",
         //Creamos un array de coches, dentro del concesionario
@@ -45,6 +46,7 @@ let concesionario = [
         ],
     },
     {
+        id: 1,
         nombre: "Nombre Y",
         direccion: "Calle Y",
         coches: [
@@ -54,6 +56,7 @@ let concesionario = [
         ],
     },
     {
+        id: 2,
         nombre: "Nombre H",
         direccion: "Calle H",
         coches: [
@@ -91,8 +94,11 @@ app.post("/concesionarios", (request, response) => {
 // Obtener un solo concesionarios
 app.get("/concesionarios/:id", (request, response) => {
     const id = request.params.id;
-    const result = concesionario[id];
-    response.json({ result });
+    client.then(() => {
+        const db = client.db("concesionariosdb");
+        const collection = db.collection("concesionarios");
+        response.json(collection.find({ id: id }));
+    });
 });
 
 // Actualizar un solo concesionarios
@@ -100,12 +106,20 @@ app.put("/concesionarios/:id", (request, response) => {
     const id = request.params.id;
     concesionario[id] = request.body;
     response.json({ message: "ok" });
+    client.then(() => {
+        const db = client.db("concesionariosdb");
+        const collection = db.collection("concesionarios");
+        collection.updateOne({ id: id }, { $set: request.body });
+    });
 });
 
 // Borrar un elemento del array
 app.delete("/concesionarios/:id", (request, response) => {
     const id = parseInt(request.params.id);
-    concesionario = concesionario.filter((item, index) => index !== id);
+    client.then(() => {
+        const db = client.db("concesionariosdb");
+        const client = db.collection("concseionarios");
+        collection.deleteOne({id: id});
 
     response.json({ message: "ok" });
 });
@@ -115,6 +129,11 @@ app.delete("/concesionarios/:id", (request, response) => {
 app.get("/concesionarios/:id/coches", (request, response) => {
     const id = request.params.id;
     response.json(concesionario[id].coches);
+    client.then(() => {
+        const db = client.db("concesionariosdb");
+        const collection = db.collection("concesionarios");
+        response.json(collection.find({ id: id }));
+    });
 });
 
 // Añadir un nuevo coche al concesionario
