@@ -17,8 +17,12 @@ const app = express();
 // Indicamos que la aplicación puede recibir JSON (API Rest)
 app.use(express.json());
 
+const url = "mongodb://localhost:27017/concesionariosdb";
+
+const client = new MongoClient(url);
+
 // Indicamos el puerto en el que vamos a desplegar la aplicación
-const port = process.env.PORT || 8081;
+const port = process.env.PORT || 8080;
 
 // Arrancamos la aplicación
 app.listen(port, () => {
@@ -60,15 +64,28 @@ let concesionario = [
     },
 ];
 
+//Conectamos la base de datos
+client.connect();
+
 // Lista todos los concesionarios
 app.get("/concesionarios", (request, response) => {
     response.json(concesionario);
+    client.then(() => {
+        const db = client.db("concesionariosdb");
+        const collection = db.collection("concesionarios");
+        response.json(collection.find());
+    });
 });
 
 // Añadir un nuevo concesionarios
 app.post("/concesionarios", (request, response) => {
     concesionario.push(request.body);
     response.json({ message: "ok" });
+    client.then(() => {
+        const db = client.db("concesionariosdb");
+        const collection = db.collection("concesionarios");
+        collection.insertOne(request.body);
+    });
 });
 
 // Obtener un solo concesionarios
@@ -132,26 +149,22 @@ app.delete("/concesionarios/:id/coches/:cocheid", (request, response) => {
     response.json({ message: "ok" });
 });
 
-const url = "mongodb://localhost:27017/concesionariosdb";
-
-const client = new MongoClient(url);
-
-client
-    .connect()
-    .then(() => {
-        console.log("Conexion con la base de datos abierta");
-        const db = client.db("concesionariosdb");
-        const collection = db.collection("concesionarios");
-        collection
-            .find({ nombre: "Nombre X" })
-            .toArray()
-            .then((documents) => {
-                console.log("Consulta completada. Datos de las consultas:", documents);
-            })
-            .catch((err) => {
-                console.error("Error al realizar la consulta:", err);
-            });
-    })
-    .catch((error) => {
-        console.error("Error al conectar a la base de datos:", error);
-    });
+//client
+//    .connect()
+//    .then(() => {
+//        console.log("Conexion con la base de datos abierta");
+//        const db = client.db("concesionariosdb");
+//        const collection = db.collection("concesionarios");
+//        collection
+//            .find({ nombre: "Nombre X" })
+//            .toArray()
+//            .then((documents) => {
+//                console.log("Consulta completada. Datos de las consultas:", documents);
+//            })
+//            .catch((err) => {
+//                console.error("Error al realizar la consulta:", err);
+//            });
+//    })
+//    .catch((error) => {
+//        console.error("Error al conectar a la base de datos:", error);
+//    });
