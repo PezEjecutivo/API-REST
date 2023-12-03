@@ -36,6 +36,7 @@ app.listen(port, () => {
 //Creamos el JSON de concesionario y sus arrays de coches
 let concesionario = [
     {
+        id: 0,
         nombre: "Nombre X",
         direccion: "Calle X",
         //Creamos un array de coches, dentro del concesionario
@@ -46,6 +47,7 @@ let concesionario = [
         ],
     },
     {
+        id: 1,
         nombre: "Nombre Y",
         direccion: "Calle Y",
         coches: [
@@ -55,6 +57,7 @@ let concesionario = [
         ],
     },
     {
+        id: 2,
         nombre: "Nombre H",
         direccion: "Calle H",
         coches: [
