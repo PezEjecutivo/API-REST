@@ -10,15 +10,20 @@
 const express = require("express");
 //Importamos mongodb con el siguiente comando
 const MongoClient = require("mongodb").MongoClient;
+//importamos helmet
+const helmet = require("helmet");
 
 // Inicializamos la aplicación
 const app = express();
+
+//Usamos helmet
+app.use(helmet());
 
 // Indicamos que la aplicación puede recibir JSON (API Rest)
 app.use(express.json());
 
 // Indicamos el puerto en el que vamos a desplegar la aplicación
-const port = process.env.PORT || 8081;
+const port = process.env.PORT || 8080;
 
 // Arrancamos la aplicación
 app.listen(port, () => {
