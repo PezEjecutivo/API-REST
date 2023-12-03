@@ -268,23 +268,3 @@ app.delete("/concesionarios/:id/coches/:cocheid", async (request, response) => {
 
     response.json({ message: "ok" });
 });
-
-//client
-//    .connect()
-//    .then(() => {
-//        console.log("Conexion con la base de datos abierta");
-//        const db = client.db("concesionariosdb");
-//        const collection = db.collection("concesionarios");
-//        collection
-//            .find({ nombre: "Nombre X" })
-//            .toArray()
-//            .then((documents) => {
-//                console.log("Consulta completada. Datos de las consultas:", documents);
-//            })
-//            .catch((err) => {
-//                console.error("Error al realizar la consulta:", err);
-//            });
-//    })
-//    .catch((error) => {
-//        console.error("Error al conectar a la base de datos:", error);
-//    });
