@@ -22,7 +22,7 @@ const url = "mongodb://localhost:27017/concesionariosdb";
 const client = new MongoClient(url);
 
 // Indicamos el puerto en el que vamos a desplegar la aplicación
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8081;
 
 // Arrancamos la aplicación
 app.listen(port, () => {
@@ -32,157 +32,234 @@ app.listen(port, () => {
 // Definimos una estructura de datos
 // (temporal hasta incorporar una base de datos)
 
-//Creamos el JSON de concesionario y sus arrays de coches
-let concesionario = [
-    {
-        id: 0,
-        nombre: "Nombre X",
-        direccion: "Calle X",
-        //Creamos un array de coches, dentro del concesionario
-        coches: [
-            { id: 0, modelo: "Modelo 1X", cv: "1X cv", precio: "1X Dinero" },
-            { id: 1, modelo: "Modelo 2X", cv: "2X cv", precio: "2X Dinero" },
-            { id: 2, modelo: "Modelo 3X", cv: "3X cv", precio: "3X Dinero" },
-        ],
-    },
-    {
-        id: 1,
-        nombre: "Nombre Y",
-        direccion: "Calle Y",
-        coches: [
-            { id: 0, modelo: "Modelo 1Y", cv: "1Y cv", precio: "1Y Dinero" },
-            { id: 1, modelo: "Modelo 2Y", cv: "2Y cv", precio: "2Y Dinero" },
-            { id: 2, modelo: "Modelo 3Y", cv: "3Y cv", precio: "3Y Dinero" },
-        ],
-    },
-    {
-        id: 2,
-        nombre: "Nombre H",
-        direccion: "Calle H",
-        coches: [
-            { id: 0, modelo: "Modelo 1H", cv: "1H cv", precio: "1H Dinero" },
-            { id: 1, modelo: "Modelo 2H", cv: "2H cv", precio: "2H Dinero" },
-            { id: 2, modelo: "Modelo 3H", cv: "3H cv", precio: "3H Dinero" },
-        ],
-    },
-];
-
 //Conectamos la base de datos
 client.connect();
 
 // Lista todos los concesionarios
-app.get("/concesionarios", (request, response) => {
-    response.json(concesionario);
-    client.then(() => {
+app.get("/concesionarios", async (request, response) => {
+    try {
+        const client = await MongoClient.connect(url);
         const db = client.db("concesionariosdb");
         const collection = db.collection("concesionarios");
-        response.json(collection.find());
-    });
+
+        const concesionarios = await collection.find().toArray();
+
+        response.json(concesionarios);
+    } catch (error) {
+        console.error(error);
+        response.status(500).send("Error en la búsqueda de concesionarios");
+    } finally {
+        // Asegúrate de cerrar la conexión cuando hayas terminado
+        if (client) {
+            await client.close();
+        }
+    }
 });
 
 // Añadir un nuevo concesionarios
-app.post("/concesionarios", (request, response) => {
-    concesionario.push(request.body);
-    response.json({ message: "ok" });
-    client.then(() => {
+app.post("/concesionarios", async (request, response) => {
+    try {
+        const client = await MongoClient.connect(url);
         const db = client.db("concesionariosdb");
         const collection = db.collection("concesionarios");
-        collection.insertOne(request.body);
-    });
+
+        const concesionarios = await collection.insertOne(request.body);
+
+        response.json(concesionarios);
+    } catch (error) {
+        console.error(error);
+        response.status(500).send("Error en la búsqueda de concesionarios");
+    } finally {
+        // Asegúrate de cerrar la conexión cuando hayas terminado
+        if (client) {
+            await client.close();
+        }
+    }
 });
 
 // Obtener un solo concesionarios
-app.get("/concesionarios/:id", (request, response) => {
-    const id = request.params.id;
-    client.then(() => {
+app.get("/concesionarios/:id", async (request, response) => {
+    const id = parseInt(request.params.id);
+    try {
+        const client = await MongoClient.connect(url);
         const db = client.db("concesionariosdb");
         const collection = db.collection("concesionarios");
-        response.json(collection.find({ id: id }));
-    });
+
+        const concesionarios = await collection.find({ id: id }).toArray();
+
+        response.json(concesionarios);
+    } catch (error) {
+        console.error(error);
+        response.status(500).send("Error en la búsqueda de concesionarios");
+    } finally {
+        // Asegúrate de cerrar la conexión cuando hayas terminado
+        if (client) {
+            await client.close();
+        }
+    }
 });
 
 // Actualizar un solo concesionarios
-app.put("/concesionarios/:id", (request, response) => {
-    const id = request.params.id;
-    concesionario[id] = request.body;
-    response.json({ message: "ok" });
-    client.then(() => {
+app.put("/concesionarios/:id", async (request, response) => {
+    const id = parseInt(request.params.id);
+    try {
+        const client = await MongoClient.connect(url);
         const db = client.db("concesionariosdb");
         const collection = db.collection("concesionarios");
-        collection.updateOne({ id: id }, { $set: request.body });
-    });
+
+        const concesionarios = await collection.updateOne({ id: id }, { $set: request.body });
+
+        //response.json({ message: "ok" });
+        response.json(concesionarios);
+    } catch (error) {
+        console.error(error);
+        response.status(500).send("Error en la búsqueda de concesionarios");
+    } finally {
+        // Asegúrate de cerrar la conexión cuando hayas terminado
+        if (client) {
+            await client.close();
+        }
+    }
 });
 
 // Borrar un elemento del array
-app.delete("/concesionarios/:id", (request, response) => {
+app.delete("/concesionarios/:id", async (request, response) => {
     const id = parseInt(request.params.id);
-    client.then(() => {
+    try {
+        const client = await MongoClient.connect(url);
         const db = client.db("concesionariosdb");
-        const collection = db.collection("concseionarios");
-        collection.deleteOne({ id: id });
+        const collection = db.collection("concesionarios");
 
-        response.json({ message: "ok" });
-    });
+        const concesionarios = await collection.deleteOne({ id: id });
+
+        //response.json({ message: "ok" });
+        response.json(concesionarios);
+    } catch (error) {
+        console.error(error);
+        response.status(500).send("Error en la búsqueda de concesionarios");
+    } finally {
+        // Asegúrate de cerrar la conexión cuando hayas terminado
+        if (client) {
+            await client.close();
+        }
+    }
 });
 
 //Hacemos el apartado de coches dentro de los concesionarios
 // Lista todos los coches de un concesionario
-app.get("/concesionarios/:id/coches", (request, response) => {
-    const id = request.params.id;
-    response.json(concesionario[id].coches);
-    client.then(() => {
+app.get("/concesionarios/:id/coches", async (request, response) => {
+    const id = parseInt(request.params.id);
+    try {
+        const client = await MongoClient.connect(url);
         const db = client.db("concesionariosdb");
         const collection = db.collection("concesionarios");
-        response.json(collection.find({ id: id }, { coches: 1, _id: 0 }));
-    });
+
+        const concesionarios = await collection.find({ id: id }, { projection: { _id: 0, coches: 1 } }).toArray();
+
+        //response.json({ message: "ok" });
+        response.json(concesionarios);
+    } catch (error) {
+        console.error(error);
+        response.status(500).send("Error en la búsqueda de concesionarios");
+    } finally {
+        // Asegúrate de cerrar la conexión cuando hayas terminado
+        if (client) {
+            await client.close();
+        }
+    }
 });
 
 // Añadir un nuevo coche al concesionario
-app.post("/concesionarios/:id/coches", (request, response) => {
-    const id = request.params.id;
+app.post("/concesionarios/:id/coches", async (request, response) => {
+    const id = parseInt(request.params.id);
     response.json({ message: "ok" });
-    client.then(() => {
+    try {
+        const client = await MongoClient.connect(url);
         const db = client.db("concesionariosdb");
         const collection = db.collection("concesionarios");
-        collection.update({ id: id }, { $push: { coches: request.body } });
-    });
+
+        const concesionarios = await collection.updateOne({ id: id }, { $push: { coches: request.body } });
+    } catch (error) {
+        console.error(error);
+        response.status(500).send("Error en la búsqueda de concesionarios");
+    } finally {
+        // Asegúrate de cerrar la conexión cuando hayas terminado
+        if (client) {
+            await client.close();
+        }
+    }
 });
 
 // Obtener un solo coche del concesionario
-app.get("/concesionarios/:id/coches/:cocheid", (request, response) => {
-    const id = request.params.id;
-    const cocheid = request.params.cocheid;
-    client.then(() => {
+app.get("/concesionarios/:id/coches/:cocheid", async (request, response) => {
+    const id = parseInt(request.params.id);
+    const cocheid = parseInt(request.params.cocheid);
+    try {
+        const client = await MongoClient.connect(url);
         const db = client.db("concesionariosdb");
         const collection = db.collection("concesionarios");
-        response.json(collection.find({ id: id }, { coches: { $elemMatch: { id: cocheid } } }));
-    });
+
+        const resultado = await collection.findOne(
+            { id: id },
+            { projection: { _id: 0, coches: { $elemMatch: { id: cocheid } } } }
+        );
+
+        //response.json({ message: "ok" });
+        response.json(resultado);
+    } catch (error) {
+        console.error(error);
+        response.status(500).send("Error en la búsqueda de concesionarios");
+    } finally {
+        // Asegúrate de cerrar la conexión cuando hayas terminado
+        if (client) {
+            await client.close();
+        }
+    }
 });
 
 // Actualizar un solo coche del concesionario
-app.put("/concesionarios/:id/coches/:cocheid", (request, response) => {
+app.put("/concesionarios/:id/coches/:cocheid", async (request, response) => {
     const id = request.params.id;
     const cocheid = request.params.cocheid;
-    client.then(() => {
+    try {
+        const client = await MongoClient.connect(url);
         const db = client.db("concesionariosdb");
         const collection = db.collection("concesionarios");
-        collection.update({ id: id, "coches.id": cocheid }, { $set: request.body });
-    });
-    response.json({ message: "ok" });
+
+        const concesionarios = await collection.updateOne(
+            { id: id, "coches.id": cocheid },
+            { $set: { "coches.$": request.body } }
+        );
+    } catch (error) {
+        console.error(error);
+        response.status(500).send("Error en la búsqueda de concesionarios");
+    } finally {
+        // Asegúrate de cerrar la conexión cuando hayas terminado
+        if (client) {
+            await client.close();
+        }
+    }
 });
 
 // Borrar un elemento del array
-app.delete("/concesionarios/:id/coches/:cocheid", (request, response) => {
+app.delete("/concesionarios/:id/coches/:cocheid", async (request, response) => {
     const id = parseInt(request.params.id);
     const cocheid = parseInt(request.params.cocheid);
-    concesionario[id].coches = concesionario[id].coches.filter((item, index) => index !== cocheid);
-    client.then(() => {
+    try {
+        const client = await MongoClient.connect(url);
         const db = client.db("concesionariosdb");
-        const collection = db.collection("concseionarios");
-        collection.deleteOne({ id: id, "coches.id": cocheid });
+        const collection = db.collection("concesionarios");
 
-        response.json({ message: "ok" });
-    });
+        const concesionarios = await collection.updateOne({ id: id }, { $pull: { coches: { id: cocheid } } });
+    } catch (error) {
+        console.error(error);
+        response.status(500).send("Error en la búsqueda de concesionarios");
+    } finally {
+        // Asegúrate de cerrar la conexión cuando hayas terminado
+        if (client) {
+            await client.close();
+        }
+    }
 
     response.json({ message: "ok" });
 });
