@@ -147,15 +147,10 @@ client
         console.log("Conexion con la base de datos abierta");
         const db = client.db("concesionariosdb");
         const collection = db.collection("concesionarios");
-        collection
-            .find({ nombre: "Nombre X" })
-            .toArray()
-            .then((documents) => {
-                console.log("Consulta completada. Datos de las consultas:", documents);
-            })
-            .catch((err) => {
-                console.error("Error al realizar la consulta:", err);
-            });
+        collection.insertOne(concesionario[0]);
+        collection.insertOne(concesionario[1]);
+        collection.insertOne(concesionario[2]);
+        console.log("Los datos se han insertado correctamente");
     })
     .catch((error) => {
         console.error("Error al conectar a la base de datos:", error);
