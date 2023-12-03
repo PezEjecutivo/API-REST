@@ -40,9 +40,9 @@ let concesionario = [
         direccion: "Calle X",
         //Creamos un array de coches, dentro del concesionario
         coches: [
-            { modelo: "Modelo 1X", cv: "1X cv", precio: "1X Dinero" },
-            { modelo: "Modelo 2X", cv: "2X cv", precio: "2X Dinero" },
-            { modelo: "Modelo 3X", cv: "3X cv", precio: "3X Dinero" },
+            { id: 0, modelo: "Modelo 1X", cv: "1X cv", precio: "1X Dinero" },
+            { id: 1, modelo: "Modelo 2X", cv: "2X cv", precio: "2X Dinero" },
+            { id: 2, modelo: "Modelo 3X", cv: "3X cv", precio: "3X Dinero" },
         ],
     },
     {
@@ -50,9 +50,9 @@ let concesionario = [
         nombre: "Nombre Y",
         direccion: "Calle Y",
         coches: [
-            { modelo: "Modelo 1Y", cv: "1Y cv", precio: "1Y Dinero" },
-            { modelo: "Modelo 2Y", cv: "2Y cv", precio: "2Y Dinero" },
-            { modelo: "Modelo 3Y", cv: "3Y cv", precio: "3Y Dinero" },
+            { id: 0, modelo: "Modelo 1Y", cv: "1Y cv", precio: "1Y Dinero" },
+            { id: 1, modelo: "Modelo 2Y", cv: "2Y cv", precio: "2Y Dinero" },
+            { id: 2, modelo: "Modelo 3Y", cv: "3Y cv", precio: "3Y Dinero" },
         ],
     },
     {
@@ -60,9 +60,9 @@ let concesionario = [
         nombre: "Nombre H",
         direccion: "Calle H",
         coches: [
-            { modelo: "Modelo 1H", cv: "1H cv", precio: "1H Dinero" },
-            { modelo: "Modelo 2H", cv: "2H cv", precio: "2H Dinero" },
-            { modelo: "Modelo 3H", cv: "3H cv", precio: "3H Dinero" },
+            { id: 0, modelo: "Modelo 1H", cv: "1H cv", precio: "1H Dinero" },
+            { id: 1, modelo: "Modelo 2H", cv: "2H cv", precio: "2H Dinero" },
+            { id: 2, modelo: "Modelo 3H", cv: "3H cv", precio: "3H Dinero" },
         ],
     },
 ];
@@ -118,10 +118,11 @@ app.delete("/concesionarios/:id", (request, response) => {
     const id = parseInt(request.params.id);
     client.then(() => {
         const db = client.db("concesionariosdb");
-        const client = db.collection("concseionarios");
-        collection.deleteOne({id: id});
+        const collection = db.collection("concseionarios");
+        collection.deleteOne({ id: id });
 
-    response.json({ message: "ok" });
+        response.json({ message: "ok" });
+    });
 });
 
 //Hacemos el apartado de coches dentro de los concesionarios
@@ -132,30 +133,41 @@ app.get("/concesionarios/:id/coches", (request, response) => {
     client.then(() => {
         const db = client.db("concesionariosdb");
         const collection = db.collection("concesionarios");
-        response.json(collection.find({ id: id }));
+        response.json(collection.find({ id: id }, { coches: 1, _id: 0 }));
     });
 });
 
 // Añadir un nuevo coche al concesionario
 app.post("/concesionarios/:id/coches", (request, response) => {
     const id = request.params.id;
-    concesionario[id].coches.push(request.body);
     response.json({ message: "ok" });
+    client.then(() => {
+        const db = client.db("concesionariosdb");
+        const collection = db.collection("concesionarios");
+        collection.update({ id: id }, { $push: { coches: request.body } });
+    });
 });
 
 // Obtener un solo coche del concesionario
 app.get("/concesionarios/:id/coches/:cocheid", (request, response) => {
     const id = request.params.id;
     const cocheid = request.params.cocheid;
-    const result = concesionario[id].coches[cocheid];
-    response.json({ result });
+    client.then(() => {
+        const db = client.db("concesionariosdb");
+        const collection = db.collection("concesionarios");
+        response.json(collection.find({ id: id }, { coches: { $elemMatch: { id: cocheid } } }));
+    });
 });
 
 // Actualizar un solo coche del concesionario
 app.put("/concesionarios/:id/coches/:cocheid", (request, response) => {
     const id = request.params.id;
     const cocheid = request.params.cocheid;
-    concesionario[id].coches[cocheid] = request.body;
+    client.then(() => {
+        const db = client.db("concesionariosdb");
+        const collection = db.collection("concesionarios");
+        collection.update({ id: id, "coches.id": cocheid }, { $set: request.body });
+    });
     response.json({ message: "ok" });
 });
 
@@ -164,6 +176,13 @@ app.delete("/concesionarios/:id/coches/:cocheid", (request, response) => {
     const id = parseInt(request.params.id);
     const cocheid = parseInt(request.params.cocheid);
     concesionario[id].coches = concesionario[id].coches.filter((item, index) => index !== cocheid);
+    client.then(() => {
+        const db = client.db("concesionariosdb");
+        const collection = db.collection("concseionarios");
+        collection.deleteOne({ id: id, "coches.id": cocheid });
+
+        response.json({ message: "ok" });
+    });
 
     response.json({ message: "ok" });
 });
