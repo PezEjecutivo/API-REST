@@ -1,0 +1,178 @@
+{
+    "swagger": "2.0",
+    "basePath": "/",
+    "info": {
+        "title": "Concesionarios API",
+        "version": "1.0.2"
+    },
+    "definitions": {
+        "Concesionarios": {
+            "type": "object",
+            "properties": {
+                "nombre": {
+                    "type": "string"
+                },
+                "direccion": {
+                    "type": "string"
+                },
+                "Coche": {
+                    "type": "object",
+                    "properties": {
+                        "marca": {
+                            "type": "string"
+                        },
+                        "modelo": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["marca", "modelo"]
+                }
+            }
+        },
+        "Coche": {
+            "type": "object",
+            "properties": {
+                "marca": {
+                    "type": "string"
+                },
+                "modelo": {
+                    "type": "string"
+                }
+            },
+            "required": ["marca", "modelo"]
+        }
+    },
+    "paths": {
+        "/Concesionarios": {
+            "get": {
+                "summary": "Get all Concesionarios.",
+                "responses": {
+                    "200": {
+                        "description": "Array with Concesionarios.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Concesionarios"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a concesionario.",
+                "consumes": ["application/json"],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "coche",
+                        "schema": {
+                            "$ref": "#/definitions/Concesionarios"
+                        }
+                    }
+                ]
+            }
+        },
+        "/Concesionarios/{id}": {
+            "get": {
+                "summary": "Get one concesionario by ID.",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "id",
+                        "type": "integer",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetch one concesionario",
+                        "schema": {
+                            "$ref": "#/definitions/Concesionarios"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update one concesionario by ID.",
+                "consumes": ["application/json"],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "name": "concesionario",
+                        "schema": {
+                            "$ref": "#/definitions/Concesionarios"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{message: 'ok'}"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete one concesionario by ID",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{message: 'ok'}"
+                    }
+                }
+            }
+        },
+        "/Concesionarios/{id}/coches": {
+            "get": {
+                "summary": "Get all coches of one concesionario.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array with coches of one concesionario.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Coche"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a coche in a concesionario.",
+                "consumes": ["application/json"],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "coche",
+                        "schema": {
+                            "$ref": "#/definitions/Coche"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{message: 'ok'}"
+                    }
+                }
+            }
+        }
+    }
+}

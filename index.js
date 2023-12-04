@@ -12,6 +12,9 @@ const express = require("express");
 const MongoClient = require("mongodb").MongoClient;
 //importamos helmet
 const helmet = require("helmet");
+//Importamos Swagger
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger.json");
 
 // Inicializamos la aplicación
 const app = express();
@@ -21,6 +24,9 @@ app.use(helmet());
 
 // Indicamos que la aplicación puede recibir JSON (API Rest)
 app.use(express.json());
+
+//Configuracion de swagger
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const url = "mongodb://localhost:27017/concesionariosdb";
 
