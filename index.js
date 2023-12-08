@@ -60,7 +60,6 @@ app.get("/concesionarios", async (request, response) => {
         console.error(error);
         response.status(500).send("Error en la búsqueda de concesionarios");
     } finally {
-        // Asegúrate de cerrar la conexión cuando hayas terminado
         if (client) {
             await client.close();
         }
@@ -76,12 +75,11 @@ app.post("/concesionarios", async (request, response) => {
 
         const concesionarios = await collection.insertOne(request.body);
 
-        response.json(concesionarios);
+        response.json({ message: "ok" });
     } catch (error) {
         console.error(error);
         response.status(500).send("Error en la búsqueda de concesionarios");
     } finally {
-        // Asegúrate de cerrar la conexión cuando hayas terminado
         if (client) {
             await client.close();
         }
@@ -103,7 +101,6 @@ app.get("/concesionarios/:id", async (request, response) => {
         console.error(error);
         response.status(500).send("Error en la búsqueda de concesionarios");
     } finally {
-        // Asegúrate de cerrar la conexión cuando hayas terminado
         if (client) {
             await client.close();
         }
@@ -120,13 +117,11 @@ app.put("/concesionarios/:id", async (request, response) => {
 
         const concesionarios = await collection.updateOne({ id: id }, { $set: request.body });
 
-        //response.json({ message: "ok" });
-        response.json(concesionarios);
+        response.json({ message: "ok" });
     } catch (error) {
         console.error(error);
         response.status(500).send("Error en la búsqueda de concesionarios");
     } finally {
-        // Asegúrate de cerrar la conexión cuando hayas terminado
         if (client) {
             await client.close();
         }
@@ -143,13 +138,11 @@ app.delete("/concesionarios/:id", async (request, response) => {
 
         const concesionarios = await collection.deleteOne({ id: id });
 
-        //response.json({ message: "ok" });
-        response.json(concesionarios);
+        response.json({ message: "ok" });
     } catch (error) {
         console.error(error);
         response.status(500).send("Error en la búsqueda de concesionarios");
     } finally {
-        // Asegúrate de cerrar la conexión cuando hayas terminado
         if (client) {
             await client.close();
         }
@@ -173,7 +166,6 @@ app.get("/concesionarios/:id/coches", async (request, response) => {
         console.error(error);
         response.status(500).send("Error en la búsqueda de concesionarios");
     } finally {
-        // Asegúrate de cerrar la conexión cuando hayas terminado
         if (client) {
             await client.close();
         }
@@ -194,7 +186,6 @@ app.post("/concesionarios/:id/coches", async (request, response) => {
         console.error(error);
         response.status(500).send("Error en la búsqueda de concesionarios");
     } finally {
-        // Asegúrate de cerrar la conexión cuando hayas terminado
         if (client) {
             await client.close();
         }
@@ -215,13 +206,11 @@ app.get("/concesionarios/:id/coches/:cocheid", async (request, response) => {
             { projection: { _id: 0, coches: { $elemMatch: { id: cocheid } } } }
         );
 
-        //response.json({ message: "ok" });
         response.json(resultado);
     } catch (error) {
         console.error(error);
         response.status(500).send("Error en la búsqueda de concesionarios");
     } finally {
-        // Asegúrate de cerrar la conexión cuando hayas terminado
         if (client) {
             await client.close();
         }
@@ -230,8 +219,8 @@ app.get("/concesionarios/:id/coches/:cocheid", async (request, response) => {
 
 // Actualizar un solo coche del concesionario
 app.put("/concesionarios/:id/coches/:cocheid", async (request, response) => {
-    const id = request.params.id;
-    const cocheid = request.params.cocheid;
+    const id = parseInt(request.params.id);
+    const cocheid = parseInt(request.params.cocheid);
     try {
         const client = await MongoClient.connect(url);
         const db = client.db("concesionariosdb");
@@ -239,13 +228,19 @@ app.put("/concesionarios/:id/coches/:cocheid", async (request, response) => {
 
         const concesionarios = await collection.updateOne(
             { id: id, "coches.id": cocheid },
-            { $set: { "coches.$": request.body } }
+            {
+                $set: {
+                    "coches.$.modelo": request.body.modelo,
+                    "coches.$.cv": request.body.cv,
+                    "coches.$.precio": request.body.precio,
+                },
+            }
         );
+        response.json({ message: "ok" });
     } catch (error) {
         console.error(error);
         response.status(500).send("Error en la búsqueda de concesionarios");
     } finally {
-        // Asegúrate de cerrar la conexión cuando hayas terminado
         if (client) {
             await client.close();
         }
@@ -262,11 +257,11 @@ app.delete("/concesionarios/:id/coches/:cocheid", async (request, response) => {
         const collection = db.collection("concesionarios");
 
         const concesionarios = await collection.updateOne({ id: id }, { $pull: { coches: { id: cocheid } } });
+        response.json({ message: "ok" });
     } catch (error) {
         console.error(error);
         response.status(500).send("Error en la búsqueda de concesionarios");
     } finally {
-        // Asegúrate de cerrar la conexión cuando hayas terminado
         if (client) {
             await client.close();
         }
